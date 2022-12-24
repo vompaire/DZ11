@@ -124,11 +124,11 @@ class Board:
                 if self.proverka(ship) == True:
                     print("Убил")
                     self.carpet(ship, verb=True)
-                    print("Стреляй еще")
+                    print("Стреляй еще, если еще не победил")
                     return True
                 else:
                     print("RANEN")
-                    print("Стреляй еще")
+                    print("Стреляй еще,")
                     return True
 
         self.field[x][y] = "T"
