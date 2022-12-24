@@ -1,392 +1,246 @@
-# Интерфейс 6 на 6 с полями от 1 до 6, с  пустотой в уголке СДЕЛАНО?
-# Класс доски с размещенными кораблями
-# Сделать класс с кораблей с инфой о его положение на карте
-# Комп ходит рандомно, но не стреляет туда где он уже стрелял
-# корабли не могут соприкасаться
-# корабли один трешник, два двушника и четыре единички
-# Запрет на выстрел в туже точку, при ошибки исключение
-# X подбитые T промохи
-# при возниконовение чего делать что то?
-# победитель убивший всех
-
-# сделать класс. в котором будет статус поля. и игроку и компьютеру исользуя этот класс присвоить разные поля, и по вызову этой функции выводить поле
+#Много было чего было переделано / и списано. нельзя давать вебинары на дз=/. одним глазком глянул и сразу понимаешь что то что писал сам вообще не в какие ворота=(
 import random
-import statistics
 
 
-def pole(s):
-    print(" ", 1, 2, 3, 4, 5, 6)
-    for i in range(1, 7):
-        print(i, end=" ")
-        for j in range(1, 7):
-            print(s[i][j], end=" ")
-        print()
+class AllEception(Exception):
+    pass
 
 
-class Desk:
+class OutException(AllEception):
+    def __str__(self):
+        return "Выстрел за доску"
 
-    def status(self, s):
-        return s
 
-    def start_location_one(self, pole, x, y):
-        self.x = x
-        self.y = y
-        self.pole = pole
-        # ОДИН ЗДОРОВЫЙ КОСТЫЛЬ
-        if pole[x][y] == "O":
-            if x == 1 and y == 1:
-                if pole[x][y + 1] == pole[x][y] == pole[x + 1][y] == pole[x + 1][y + 1] == "O":
-                    pole[x][y] = "S"
-            if x == 6 and y == 6:
-                if pole[x][y - 1] == pole[x][y] == pole[x - 1][y] == pole[x - 1][y - 1] == "O":
-                    pole[x][y] = "S"
-            if x == 1 and y == 6:
-                if pole[x][y - 1] == pole[x][y] == pole[x + 1][y] == pole[x + 1][y - 1] == "O":
-                    pole[x][y] = "S"
-            if x == 6 and y == 1:
-                if pole[x][y + 1] == pole[x][y] == pole[x - 1][y] == pole[x - 1][y + 1] == "O":
-                    pole[x][y] = "S"
-            if x == 1 and 1 < y < 6:
-                if pole[x][y + 1] == pole[x][y] == pole[x][y - 1] == pole[x + 1][y + 1] == pole[x + 1][y] == pole[x + 1][y - 1] == "O":
-                    pole[x][y] = "S"
-            if 1 < x < 6 and y == 1:
-                if pole[x - 1][y] == pole[x][y] == pole[x + 1][y] == pole[x - 1][y + 1] == pole[x][y + 1] == pole[x + 1][y + 1] == "O":
-                    pole[x][y] = "S"
-            if x == 6 and 1 < y < 6:
-                if pole[x][y + 1] == pole[x][y] == pole[x][y - 1] == pole[x - 1][y + 1] == pole[x - 1][y] == pole[x - 1][y - 1] == "O":
-                    pole[x][y] = "S"
-            if 1 < x < 6 and y == 6:
-                if pole[x - 1][y] == pole[x][y] == pole[x + 1][y] == pole[x - 1][y - 1] == pole[x][y - 1] == pole[x + 1][y - 1] == "O":
-                    pole[x][y] = "S"
-            if 1 < x < 6 and 1 < y < 6:
-                if pole[x][y - 1] == pole[x][y] == pole[x][y + 1] == pole[x + 1][y - 1] == pole[x + 1][y] == pole[x + 1][y + 1] == pole[x - 1][y - 1] == pole[x - 1][y] == pole[x - 1][y + 1] == "O":
-                    pole[x][y] = "S"  # Как тут расписать по другому, но с той же логикой ибо он уходит за список и возникает ошибка
+class ShotException(AllEception):
+    def __str__(self):
+        return "Туда уже стрельнули"
 
-    def start_location_two(self, pole, x1, y1, x2, y2):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
-        x1, x2 = min(x1, x2), max(x1, x2)
-        y1, y2 = min(y1, y2), max(y1, y2)
-        self.pole = pole
 
-        if pole[x1][y1] == pole[x2][y2] == "O":
-            if x1 == x2:  # gorizontal
-                if x1 == 1 and y1 == 1:
-                    if pole[x1][y1 + 2] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 1] == pole[x1 + 1][y1 + 2] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if x1 == 6 and y2 == 6:
-                    if pole[x1][y1 - 1] == pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if x1 == 1 and y2 == 6:
-                    if pole[x1][y1 - 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if x1 == 6 and y1 == 1:
-                    if pole[x1][y1 + 2] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1 - 1][y1 + 2] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if x1 == 1 and 1 < y1 < 6 and 1 < y2 < 6:
-                    if pole[x1][y1 - 1] == pole[x1][y1 + 2] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 1] == pole[x1 + 1][y1 + 2] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if 1 < x1 < 6 and y1 == 1:
-                    if pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1 - 1][y1 + 2] == pole[x1][y1 + 2] == pole[x1 + 1][y1 + 2] == pole[x1 + 1][y1 + 1] == pole[x1 + 1][y1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if x1 == 6 and 1 < y1 < 6 and 1 < y2 < 6:
-                    if pole[x1][y1 - 1] == pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1 - 1][y1 + 2] == pole[x1][y1 + 2] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if 1 < x1 < 6 and y2 == 6:
-                    if pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1][y1 - 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if 1 < x1 < 6 and 1 < y1 < 6 and 1 < y2 < 6:
-                    if pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1 - 1][y1 + 2] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 1] == pole[x1 + 1][y1 + 2] == pole[x1][y1 + 2] == pole[x1][y1 - 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-            if y1 == y2:  # vertical
-                if x1 == 1 and y1 == 1:
-                    if pole[x1][y1 + 1] == pole[x1 + 1][y1 + 1] == pole[x1 + 2][y1 + 1] == pole[x1 + 2][y1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if x2 == 6 and y1 == 6:
-                    if pole[x1 - 1][y1] == pole[x1 - 1][y1 - 1] == pole[x1][y1 - 1] == pole[x1 + 1][y1 - 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if x1 == 1 and y1 == 6:
-                    if pole[x1][y1 - 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 2][y1 - 1] == pole[x1 + 2][y1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if x2 == 6 and y1 == 1:
-                    if pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1][y1 + 1] == pole[x1 + 1][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if x1 == 1 and 1 < y1 < 6:
-                    if pole[x1][y1 - 1] == pole[x1][y1 + 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1 + 1] == pole[x1 + 2][y1 - 1] == pole[x1 + 2][y1] == pole[x1 + 2][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if 1 < x1 < 6 and 1 < x2 < 6 and y1 == 1:
-                    if pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1][y1 + 1] == pole[x1 + 1][y1 + 1] == pole[x1 + 2][y1 + 1] == pole[x1 + 2][y1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if x2 == 6 and 1 < y1 < 6:
-                    if pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1][y1 - 1] == pole[x1][y1 + 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if 1 < x1 < 6 and 1 < x2 < 6 and y2 == 6:
-                    if pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1][y1 - 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 2][y1 - 1] == pole[x1 + 2][y1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-                if 1 < x1 < 6 and 1 < x2 < 6 and 1 < y1 < 6:
-                    if pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1][y1 - 1] == pole[x1][y1 + 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1 + 1] == pole[x1 + 2][y1 - 1] == pole[x1 + 2][y1] == pole[x1 + 2][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-
-    def start_location_three(self, pole, x1, y1, x2, y2, x3, y3):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
-        self.x3 = x3
-        self.y3 = y3
-        k = [x1, x2, x3]
-        p = [y1, y2, y3]
-        x1, x2, x3 = min(x1, x2, x3), statistics.mean(k), max(x1, x2, x3)
-        y1, y2, y3 = min(y1, y2, y3), statistics.mean(p), max(y1, y2, y3)
-        self.pole = pole
-
-        if pole[x1][y1] == pole[x2][y2] == pole[x3][y3] == "O":
-            if x1 == x2 == x3:  # gorizontal
-                if x1 == 1 and y1 == 1:
-                    if pole[x1][y1 + 3] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 1] == pole[x1 + 1][y1 + 2] == pole[x1 + 1][y1 + 3] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if x1 == 6 and y3 == 6:
-                    if pole[x1][y1 - 1] == pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1 - 1][y1 + 2] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if x1 == 1 and y3 == 6:
-                    if pole[x1][y1 - 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 1] == pole[x1 - 1][y1 + 2] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if x1 == 6 and y1 == 1:
-                    if pole[x1][y1 + 3] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1 - 1][y1 + 2] == pole[x1 - 1][y1 + 3] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if x1 == 1 and 1 < y1 < 6 and 1 < y2 < 6 and 1 < y3 < 6:
-                    if pole[x1][y1 - 1] == pole[x1][y1 + 3] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 1] == pole[x1 + 1][y1 + 2] == pole[x1 + 1][y1 + 3] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if 1 < x1 < 6 and y1 == 1:
-                    if pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1 - 1][y1 + 2] == pole[x1 - 1][y1 + 3] == pole[x1][y1 + 3] == pole[x1 + 1][y1 + 2] == pole[x1 + 1][y1 + 1] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 3] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if x1 == 6 and 1 < y1 < 6 and 1 < y2 < 6 and 1 < y3 < 6:
-                    if pole[x1][y1 - 1] == pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1 - 1][y1 + 2] == pole[x1 - 1][y1 + 3] == pole[x1][y1 + 3] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if 1 < x1 < 6 and y3 == 6:
-                    if pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1][y1 - 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 1] == pole[x1 - 1][y1 + 3] == pole[x1 + 1][y1 + 3] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if 1 < x1 < 6 and 1 < y1 < 6 and 1 < y2 < 6 and 1 < y3 < 6:
-                    if pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1 - 1][y1 + 2] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1] == pole[x1 + 1][y1 + 1] == pole[x1 + 1][y1 + 2] == pole[x1][y1 + 3] == pole[x1][y1 - 1] == pole[x1 - 1][y1 + 3] == pole[x1 + 1][y1 + 3] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-            if y1 == y2 == y3:  # vertical
-                if x1 == 1 and y1 == 1:
-                    if pole[x1][y1 + 1] == pole[x1 + 1][y1 + 1] == pole[x1 + 2][y1 + 1] == pole[x1 + 3][y1 + 1] == pole[x + 3][y1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if x3 == 6 and y1 == 6:
-                    if pole[x1 - 1][y1] == pole[x1 - 1][y1 - 1] == pole[x1][y1 - 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 2][y1 - 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if x1 == 1 and y1 == 6:
-                    if pole[x1 + 3][y1] == pole[x1][y1 - 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 2][y1 - 1] == pole[x1 + 3][y1 - 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if x3 == 6 and y1 == 1:
-                    if pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1][y1 + 1] == pole[x1 + 1][y1 + 1] == pole[x1 + 2][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if x1 == 1 and 1 < y1 < 6:
-                    if pole[x1][y1 - 1] == pole[x1][y1 + 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1 + 1] == pole[x1 + 2][y1 - 1] == pole[x1 + 2][y1 - 1] == pole[x1 + 3][y1 - 1] == pole[x1 + 3][y3] == pole[x1 + 3][y3 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if 1 < x1 < 6 and 1 < x2 < 6 and 1 < x3 < 6 and y1 == 1:
-                    if pole[x1 - 1][y1] == pole[x1 + 3][y1] == pole[x1 - 1][y1 + 1] == pole[x1][y1 + 1] == pole[x1 + 1][y1 + 1] == pole[x1 + 2][y1 + 1] == pole[x1 + 3][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if x3 == 6 and 1 < y1 < 6:
-                    if pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1][y1 - 1] == pole[x1][y1 + 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1 + 1] == pole[x1 + 2][y1 - 1] == pole[x1 + 2][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if 1 < x1 < 6 and 1 < x2 < 6 and 1 < x3 < 6 and y1 == 6:
-                    if pole[x1 - 1][y1] == pole[x1 + 3][y1] == pole[x1 - 1][y1 - 1] == pole[x1][y1 - 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 2][y1 - 1] == pole[x1 + 3][y1 - 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-                if 1 < x1 < 6 and 1 < x2 < 6 and 1 < x3 < 6 and 1 < y1 < 6:
-                    if pole[x1 - 1][y1 - 1] == pole[x1 - 1][y1] == pole[x1 - 1][y1 + 1] == pole[x1][y1 - 1] == pole[x1][y1 + 1] == pole[x1 + 1][y1 - 1] == pole[x1 + 1][y1 + 1] == pole[x1 + 2][y1 - 1] == pole[x1 + 2][y1 + 1] == pole[x1 + 3][y1 - 1] == pole[x1 + 3][y1] == pole[x1 + 3][y1 + 1] == "O":
-                        pole[x1][y1] = "S"
-                        pole[x2][y2] = "S"
-                        pole[x3][y3] = "S"
-
-    def gun_location_one(self, pole, x, y):
-        self.x = x
-        self.y = y
-        self.pole = pole
-        pole[x][y] = "S"
+class BoardWrongShipException(AllEception):
+    pass
 
 
 class Ships:
-    pass  # 4 раза пройтись по единичке и вставить это в плейр доску и так же пройтись еще по двойкам и тройке
+    def __init__(self, x, y, l, o):
+        self.x = x
+        self.y = y
+        self.l = l
+        self.o = o
+
+    def dots(self):
+        ship_dots = []
+        for i in range(self.l):
+            cur_x = self.x
+            cur_y = self.y
+
+            if self.o == 0:
+                cur_x += i
+            elif self.o == 1:
+                cur_y += i
+            ship_dots.append((cur_x, cur_y))
+
+        return ship_dots
+
+    def gunshot(self, gunx, guny):
+        guns = [gunx, guny]
+        return guns in self.dots()
 
 
-desk_enemy = [["O" for j in range(7)] for i in range(7)]
-desk_player = [["O" for j in range(7)] for i in range(7)]
-player = Desk()
-enemy = Desk()
-one = []
-two = []
-three = []
+class Board:
+    def __init__(self, hid=False, size=6):
+        self.size = size  # pohue
+        self.hid = hid  # poheu
+        self.count = 0  # pohue
+        self.field = [["O"] * size for _ in range(size)]
+        self.busy = []
+        self.ships = []
 
-"""print("укажите где хотите поставить Единички, помните корабли не могут соприкасаться с друг другом")
-for i in range(4):
-    x, y = map(int, input().split())
-    player.start_location_one(desk_player, x, y)
-    one.append([x, y])
-print("укажите где хотите поставить двойки, помните корабли не могут соприкасаться с друг другом")
-for i in range(2):
-    x1, y1, x2, y2 = map(int, input().split())
-    player.start_location_two(desk_player, x1, y1, x2, y2)
-    two.append([x1, y1])
-    two.append([x2, y2])
-print("укажите где хотите поставить тройку, помните корабли не могут соприкасаться с друг другом")
-for i in range(1):
-    x1, y1, x2, y2, x3, y3 = map(int, input().split())
-    player.start_location_three(desk_player, x1, y1, x2, y2, x3, y3)
-    three.append([x1, y1])
-    three.append([x2, y2])
-    three.append([x3, y3])"""
-i = 1
-desk_player[1][1] = "S"
-desk_player[1][3] = "S"
-desk_player[1][5] = "S"
-desk_player[3][1] = "S"
+    def __str__(self):
 
-desk_player[3][3] = "S"
-desk_player[3][4] = "S"
-desk_player[6][6] = "S"
-desk_player[5][6] = "S"
+        res = "   1  2  3  4  5  6 \n"
+        for i in range(1, 7):
+            res += f"{i}  "
+            for j in range(1, 7):
+                res += self.field[i - 1][j - 1]
+                res += "  "
+            res += "\n"
 
-desk_player[5][1] = "S"
-desk_player[5][2] = "S"
-desk_player[5][3] = "S"
+        if self.hid:
+            res = res.replace("S", "O")
+        return res
 
-desk_enemy[1][2] = "S"
-desk_enemy[1][4] = "S"
-desk_enemy[1][6] = "S"
-desk_enemy[3][5] = "S"
+    def out(self, x, y):
+        return not ((0 <= x < self.size) and (0 <= y < self.size))
 
-desk_enemy[3][3] = "S"
-desk_enemy[4][3] = "S"
-desk_enemy[6][5] = "S"
-desk_enemy[6][6] = "S"
+    def carpet(self, ship, verb=False):
+        carpets = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)]
+        for (x, y) in ship.dots():
+            for cx, cy in carpets:
+                carpetsx = x + cx
+                carpetsy = y + cy
+                if not (self.out(carpetsx, carpetsy)) and (carpetsx, carpetsy) not in self.busy:
+                    if verb:
+                        self.field[carpetsx][carpetsy] = "T"
+                    self.busy.append((carpetsx, carpetsy))
 
-desk_enemy[6][1] = "S"
-desk_enemy[6][2] = "S"
-desk_enemy[6][3] = "S"
-count_player=0
-count_enemy=0
-q = 0
-while i != 0:
+    def add(self, ship):
+        for x, y in ship.dots():
+            if self.out(x, y) or (x, y) in self.busy:
+                raise BoardWrongShipException()
+        for x, y in ship.dots():
+            self.field[x][y] = "S"
+            self.busy.append((x, y))
 
-    x, y = map(int, input("Куда стреляем?").split())
-    if desk_enemy[x][y] == "S":
-        print("Вы попали")
-        desk_enemy[x][y] = "X"
-        count_player+=1
-        if x < 6 and y < 6 and desk_enemy[x][y - 1] != "S" and desk_enemy[x][y + 1] != "S" and desk_enemy[x - 1][y] != "S" and desk_enemy[x + 1][y] != "S":
-            print("И потопили")
-        elif x == 6 and desk_enemy[x][y - 1] != "S" and desk_enemy[x][y + 1] != "S" and desk_enemy[x - 1][y] != "S":
-            print("И потопили")
-        elif y == 6 and desk_enemy[x][y - 1] != "S" and desk_enemy[x - 1][y] != "S" and desk_enemy[x + 1][y] != "S":
-            print("И потопили")
+        self.ships.append(ship)
+        self.carpet(ship)
 
-    else:
-        print("Промох")
-        desk_enemy[x][y] = "T"
+    def proverka(self, ship):
+        carpets = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)]
+        k = 0
+        for x, y in ship.dots():
+            for cx, cy in carpets:
+                carpetsx = x + cx
+                carpetsy = y + cy
+                if not (self.out(carpetsx, carpetsy)) and self.field[carpetsx][carpetsy] in "S":
+                    k += 1
+        if k > 0:
+            return False
+        else:
+            return True
 
-    print("противник стрельнул сюда")
-    while i != 0:
-        z = random.randint(1, 6)
-        c = random.randint(1, 6)
-        if desk_player[z][c] == "S" or desk_player[z][c] == "O":
-            if desk_player[z][c] == "S":
-                desk_player[z][c] = "X"
-                count_enemy+=1
-                break
+    def shot(self, x, y):
+        if self.out(x, y):
+            raise OutException() #Стрельба вне поля
+        if (x, y) in self.busy:
+            raise ShotException() #Стрельба где уже стреляли
+        self.busy.append((x, y))
+
+        for ship in self.ships:
+            if (x, y) in ship.dots():
+                self.field[x][y] = "X"
+                print("Попадание")
+                self.count += 1
+                print(self.count)
+                if self.proverka(ship) == True:
+                    print("Убил")
+                    self.carpet(ship, verb=True)
+                    print("Стреляй еще")
+                    return True
+                else:
+                    print("RANEN")
+                    print("Стреляй еще")
+                    return True
+
+        self.field[x][y] = "T"
+        print("Мимо")
+        return False
+
+    def begin(self):
+        self.busy = []
+
+
+class Player:
+    def __init__(self, board, enemy):
+        self.board = board
+        self.enemy = enemy
+
+
+
+    def move(self):
+        while True:
+            try:
+                targetx, targety = self.ask()
+                repeat = self.enemy.shot(targetx, targety)
+                return repeat
+            except AllEception as e:
+                print(e)
+
+
+class AI(Player):
+    def ask(self):
+        dx = random.randint(0, 5)
+        dy = random.randint(0, 5)
+        print(f"Ход противника: {dx + 1} {dy + 1}")
+        return dx, dy
+
+
+class User(Player):
+    def ask(self):
+        while True:
+            cords = input("Ваш ход:").split()
+
+            if len(cords) != 2:
+                print("введите 2 координаты")
+                continue
+            x, y = cords
+
+            if not (x.isdigit()) or not (y.isdigit()):
+                print(" Введите числа! ")
+                continue
+            x, y = int(x), int(y)
+
+            return x, y
+
+
+class Game:
+    def __init__(self, size=6):
+        self.size = size
+        pl = self.random_board()
+        co = self.random_board()
+        co.hid = True
+        self.ai = AI(co, pl)
+        self.us = User(pl, co)
+
+    def try_board(self):
+        lens = [3, 2, 2, 1, 1, 1, 1]
+        board = Board(size=self.size)
+        attempts = 0
+        for l in lens:
+            while True:
+                attempts += 1
+                if attempts > 10000:
+                    return None
+                ship = Ships(random.randint(0, self.size), random.randint(0, self.size), l, random.randint(0, 1))
+                try:
+                    board.add(ship)
+                    break
+                except AllEception:
+                    pass
+        board.begin()
+        return board
+
+    def random_board(self):
+        board = None
+        while board is None:
+            board = self.try_board()
+        return board
+
+    def loop(self):
+        num = 0
+        while True:
+            print("ME")
+            print(self.us.board)
+            print("KOMP")
+            print(self.ai.board)
+            if num % 2 == 0:
+                print("Turn ME")
+                repeat = self.us.move()
             else:
-                desk_player[z][c] = "T"
+                print("Turn KOMP")
+                repeat = self.ai.move()
+            if repeat:
+                num -= 1
+            if self.ai.board.count == 11:
+                print("YOU WIN")
                 break
-    if count_player==11 or count_enemy==11:
-        break
-pole(desk_player)
-pole(desk_enemy)
+            if self.us.board.count == 11:
+                print("YOU lOSE")
+                break
+            num += 1
+
+    def start(self):
+        self.loop()
+
+
+g = Game()
+g.start()
